@@ -1,1 +1,679 @@
+AI - Generated Paper
 
+A Taxonomy of Hallucination Types in
+Large Language Models for Research
+Applications
+Abstract
+Large Language Models (LLMs) are increasingly used across research workflows for literature
+discovery, synthesis, question answering, coding, data interpretation, summarization, drafting,
+and citation generation. Their usefulness is constrained, however, by hallucinations: outputs that
+are fluent and plausible but false, unsupported, internally inconsistent, or unfaithful to an
+information source or user-provided context. Existing literature has established several related
+distinctions, including intrinsic versus extrinsic hallucination, factuality versus faithfulness
+hallucination, and errors arising from model knowledge versus failures of source grounding. Yet
+these classifications do not fully capture the heterogeneous failure modes encountered in
+research applications, where fabricated citations, incorrect quantitative claims, temporal
+knowledge errors, unsupported synthesis, methodological misrepresentation, and erroneous
+tool-mediated evidence can have consequences beyond ordinary question-answering errors.
+This paper develops a research-oriented taxonomy that organizes hallucinations along three
+complementary dimensions: epistemic relation, failure locus, and research manifestation.
+The resulting framework distinguishes factual hallucinations, source-faithfulness hallucinations,
+reasoning and inferential hallucinations, citation and bibliographic hallucinations, methodological
+hallucinations, temporal and version hallucinations, and tool- or retrieval-mediated
+hallucinations. The paper reviews established detection and mitigation approaches, including
+factuality metrics, retrieval-augmented generation, self-verification, semantic uncertainty, and
+citation-aware generation. It argues that no single evaluation paradigm is adequate because
+hallucination detection is task-, domain-, evidence-, and granularity-dependent. Finally, the
+paper identifies research gaps concerning benchmark realism, uncertainty calibration,
+provenance, longitudinal knowledge change, domain-specific evaluation, causal diagnosis, and
+human–LLM verification. A research-oriented taxonomy can therefore serve not merely as a
+descriptive classification but as a basis for choosing evaluation protocols, designing safeguards,
+and specifying trustworthy uses of LLMs in scholarly research.
+Keywords: large language models; hallucination; factuality; faithfulness; research integrity;
+citation hallucination; retrieval-augmented generation; uncertainty estimation; provenance;
+scholarly AI
+
+1. Introduction
+Large Language Models have transformed natural-language processing from a collection of
+narrowly specified prediction tasks into general-purpose systems capable of answering
+questions, summarizing documents, generating explanations, writing code, and interacting with
+external tools. These capabilities have rapidly expanded their use in scholarly and professional
+research workflows. Researchers increasingly employ LLMs for literature exploration,
+summarization, drafting, data extraction, methodological assistance, hypothesis generation, and
+interaction with scientific databases. At the same time, the models remain probabilistic
+generators rather than databases of verified propositions. Consequently, fluent language can
+coexist with inaccurate or unsupported claims.
+The literature commonly uses the term hallucination for generated content that is factually
+incorrect, unverifiable, or inconsistent with a source or instruction (Ji et al., 2023; Huang et al.,
+2024). Earlier work on neural text generation emphasized hallucination in task-specific settings
+such as summarization and data-to-text generation, where the central issue was whether
+generated text was supported by an input source (Maynez et al., 2020). With the emergence of
+open-ended LLMs, the problem has broadened. An LLM may produce a false statement even
+when no explicit source is provided, contradict an authoritative source supplied in the prompt,
+fabricate a publication that appears bibliographically plausible, misattribute a finding to an
+authentic article, or combine individually plausible observations into an unsupported scientific
+conclusion.
+This diversity presents a taxonomy problem. A classification designed for abstractive
+summarization does not adequately distinguish a fabricated DOI from an incorrect interpretation
+of an authentic paper. Conversely, a simple factual/non-factual distinction is insufficient for
+applications in which the relevant question is not only whether a statement is true, but whether it
+follows from a cited source, whether the model has accurately represented a methodology, or
+whether the evidence was available at the claimed date.
+Two broad conceptual distinctions are especially influential. The first is factuality, concerning
+agreement between generated claims and external reality or verifiable evidence. The second is
+faithfulness, concerning whether an output appropriately follows a supplied source, context, or
+instruction (Huang et al., 2024). Earlier summarization research similarly distinguished intrinsic
+errors, which contradict information in a source, from extrinsic errors, which introduce
+information not supported by that source (Maynez et al., 2020). These distinctions remain
+useful, but research applications require additional categories because the scholarly object
+being represented may itself be a paper, citation, dataset, experiment, result, method, or
+historical state of knowledge.
+This paper therefore proposes a taxonomy specifically oriented toward research applications. Its
+central argument is that hallucination should be represented as a multidimensional
+phenomenon rather than a single error class. In particular, the paper distinguishes: (1) the
+relation between a claim and the relevant truth or evidence, (2) the stage or mechanism at
+which the failure arises, and (3) the concrete research artifact or activity affected by the failure.
+
+This perspective is important because mitigation strategies are not interchangeable. Retrieval
+can reduce unsupported factual claims but cannot guarantee correct interpretation of a retrieved
+paper. Self-consistency can identify some uncertainty but cannot establish bibliographic
+existence. Citation verification can detect fabricated references but does not ensure that an
+authentic citation actually supports the associated statement. A robust research assistant
+therefore requires a layered architecture of retrieval, provenance, verification, uncertainty
+estimation, and human oversight.
+
+2. Background and Related Work
+2.1 From neural-generation hallucination to LLM hallucination
+Hallucination predates contemporary LLMs. In neural machine translation and abstractive
+summarization, generated text could be fluent while introducing entities, facts, or relationships
+absent from the source. Maynez et al. (2020) demonstrated that abstractive summarization
+systems can produce substantial amounts of unfaithful content and that standard lexical metrics
+such as ROUGE are insufficient for reliably measuring factual faithfulness. This work helped
+establish textual entailment and source-grounded evaluation as alternatives to surface-form
+overlap.
+Kryscinski et al. (2020) introduced FactCC, a factual-consistency model trained to identify
+whether summary sentences are supported by their source documents. Goyal and Durrett
+(2020) further proposed dependency-level entailment to localize factual inconsistencies rather
+than reducing an entire output to a sentence-level judgment. Other approaches employed
+question generation and question answering to compare what a source and summary imply
+about the same entities or claims.
+These developments established a foundational insight: fluency is not evidence of factuality.
+A model can produce highly coherent language while failing to preserve the truth conditions of
+the source.
+2.2 Taxonomies of LLM hallucination
+Ji et al. (2023) provided a broad survey of hallucination in natural language generation and
+synthesized distinctions across translation, dialogue, summarization, and other tasks. More
+recent surveys have adapted the taxonomy to general-purpose LLMs. Huang et al. (2024), for
+example, distinguish factuality hallucination from faithfulness hallucination and organize
+hallucination causes around data, training, and inference factors. Their framework highlights the
+fact that hallucinations can originate from limitations in training data and memorized knowledge,
+alignment objectives, prompting, decoding, or contextual grounding.
+
+The distinction is valuable but does not by itself specify what kind of research activity has failed.
+A statement such as "Smith et al. (2021) reported a significant effect" can be wrong because the
+paper does not exist, because the paper exists but did not report the effect, because the result
+was associated with a different study, or because the underlying effect was statistically
+misunderstood. All four cases may be classified as factual or faithfulness failures, but their
+detection and remediation requirements differ substantially.
+2.3 Factuality and truthfulness
+Truthfulness benchmarks such as TruthfulQA examine whether language models repeat
+common falsehoods and misconceptions learned from human text (Lin et al., 2022). Such work
+illustrates an important mechanism of hallucination: a model can reproduce plausible linguistic
+patterns associated with false propositions even when the propositions themselves are
+incorrect. In TruthfulQA, model scale did not automatically guarantee truthfulness; some larger
+systems performed worse on the benchmark than smaller models.
+FActScore introduced a more fine-grained approach for long-form generation by decomposing
+text into atomic facts and estimating what proportion of those facts are supported by a reliable
+knowledge source (Min et al., 2023). This approach is particularly relevant to research writing
+because an apparently reliable paragraph can contain a mixture of correct, partially correct, and
+fabricated claims. Evaluating at the atomic-claim level therefore provides more diagnostic
+information than assigning one binary factuality label to an entire response.
+2.4 Detecting hallucinations through uncertainty and consistency
+Another research direction asks whether the model itself contains signals indicating when it is
+likely to be wrong. Kadavath et al. (2022) studied whether language models can assess the
+validity of their own claims and introduced probability-based measures such as "P(True)" and
+"P(IK)" ("I know"). Their findings suggested that models can possess useful but imperfect
+information about their own uncertainty.
+Farquhar et al. (2024) developed semantic entropy, which estimates uncertainty at the level of
+meaning rather than surface wording. Their results showed that semantic diversity among
+sampled answers can provide a signal for hallucination, particularly for questions where the
+model lacks reliable knowledge. Such approaches shift hallucination detection from post hoc
+fact checking toward uncertainty-aware generation and selective prediction.
+Manakul et al. (2023) introduced SelfCheckGPT, a black-box method that samples multiple
+responses and identifies likely hallucinations when supposedly factual claims vary substantially
+across samples. The method illustrates another important principle: inconsistency across
+semantically equivalent generations can be evidence of epistemic uncertainty, although
+consistency alone cannot establish truth.
+
+3. A Research-Oriented Taxonomy of LLM Hallucinations
+3.1 Taxonomy design principles
+For research applications, a useful taxonomy should satisfy four criteria. First, categories should
+be operationally distinguishable, so that different classes can be evaluated with different
+methods. Second, the taxonomy should accommodate both open-domain factual claims and
+source-grounded research tasks. Third, it should distinguish errors in content from errors in
+evidence representation. Fourth, it should support mitigation mapping, allowing researchers to
+identify which controls can address a particular failure.
+The proposed framework uses three complementary dimensions:
+1. Epistemic relation: What is the relationship between the output and the truth/evidence?
+2. Failure locus: At what point in the generation pipeline does the error arise?
+3. Research manifestation: What research artifact or activity does the error affect?
+The categories below are therefore not necessarily mutually exclusive. A single output may
+simultaneously contain a source-faithfulness hallucination and a citation hallucination.
+3.2 Type I: Factual or world-knowledge hallucination
+A factual hallucination is a claim that conflicts with verifiable external knowledge or lacks
+adequate factual support when presented as fact.
+Examples include incorrect dates, invented people, wrong numerical values, false historical
+statements, or misidentified scientific findings. This is the most familiar form of hallucination and
+corresponds closely to factuality-oriented definitions in recent surveys (Ji et al., 2023; Huang et
+al., 2024).
+Within research contexts, factual hallucinations are especially consequential when they
+concern:
+● numerical results;
+● sample sizes;
+● experimental outcomes;
+● statistical significance;
+● dataset properties;
+● author names;
+● publication dates;
+● institutional affiliations;
+● scientific definitions; or
+● technical specifications.
+
+Factual errors may be atomic, affecting one proposition, or compositional, where several small
+inaccuracies accumulate into a misleading explanation. FActScore's atomic decomposition is
+particularly relevant because research prose often contains many independently checkable
+propositions (Min et al., 2023).
+3.3 Type II: Source-faithfulness hallucination
+A source-faithfulness hallucination occurs when generated content is inconsistent with,
+unsupported by, or improperly derived from an identified source.
+This category is central to literature reviews, document summarization, systematic reviews, and
+evidence synthesis. A source may state that an intervention was associated with an outcome
+while the LLM summarizes it as demonstrating causation. Similarly, a paper may report a result
+only for one subgroup while the model generalizes it to an entire population.
+The distinction from ordinary factual hallucination is important. A generated statement can even
+be factually true in the real world while being unfaithful to the cited source. For example, a
+claim may be scientifically established elsewhere but not actually reported by the article being
+summarized.
+The intrinsic/extrinsic distinction from summarization research remains useful here. Intrinsic
+errors contradict source information, whereas extrinsic errors introduce unsupported information
+(Maynez et al., 2020).
+3.4 Type III: Citation and bibliographic hallucination
+A citation hallucination involves fabricated, malformed, or improperly attributed scholarly
+references. It includes at least four subtypes:
+1. Existence hallucination: the cited paper, book, dataset, or DOI does not exist.
+2. Metadata hallucination: the work exists, but authors, title, venue, date, pages, or
+identifier are incorrect.
+3. Attribution hallucination: a real work is cited for a claim it does not support.
+4. Citation-context hallucination: an authentic reference is inserted into a paragraph in a
+way that falsely suggests evidentiary support.
+This category deserves explicit recognition in research-oriented taxonomies because
+bibliographic references are not merely prose decorations; they are part of the evidentiary
+infrastructure of scholarship.
+Empirical studies demonstrate the seriousness of the problem. Walters and Wilder (2023) found
+that, across their evaluated literature-review prompts, fabricated references were common,
+although GPT-4 substantially reduced fabrication relative to GPT-3.5. Gravel et al. (2023)
+similarly reported a high proportion of fabricated references in answers to medical questions.
+
+These findings demonstrate that citation hallucination can remain present even when the
+generated prose appears professionally written.
+A useful extension is identifier hallucination, in which a model supplies a plausible but
+nonexistent DOI, PMID, ISBN, arXiv identifier, or URL. Identifier verification is therefore an
+important component of scholarly LLM evaluation.
+3.5 Type IV: Reasoning and inferential hallucination
+A reasoning hallucination occurs when the model derives an unsupported conclusion from
+otherwise plausible premises. Unlike a simple factual error, the individual statements may be
+accurate while the inference connecting them is invalid.
+Examples include:
+● confusing correlation with causation;
+● inferring statistical significance from a large effect size without considering uncertainty;
+● treating absence of evidence as evidence of absence;
+● inferring generalizability from a narrow sample;
+● converting an observational finding into an experimental conclusion;
+● claiming that two studies are contradictory when they use different populations or
+measures.
+This category is especially important for research assistance because LLMs are frequently
+asked not only to summarize findings but to compare studies, identify causes, assess evidence
+quality, and generate hypotheses.
+Reasoning hallucinations challenge simple fact-checking because verifying individual
+propositions may not reveal the inferential failure. Evaluation must therefore sometimes operate
+on argument structure, assumptions, and logical entailment.
+3.6 Type V: Methodological hallucination
+A methodological hallucination occurs when an LLM incorrectly represents a research
+method, experimental procedure, dataset construction process, statistical technique, or
+analytical protocol.
+Examples include attributing a randomized controlled trial design to an observational study,
+stating that a paper used logistic regression when it used a survival model, or claiming that a
+dataset contains variables that are absent from its published documentation.
+Methodological hallucination deserves a separate class because methods are often used as the
+basis for judging evidence quality. An incorrect representation can therefore distort not only one
+fact but the researcher's entire assessment of a study.
+
+A related problem is procedural invention, where the model fills missing experimental details
+with plausible-sounding assumptions. Such details may be particularly difficult to identify
+because the invented method can be scientifically reasonable even though it was never
+performed.
+3.7 Type VI: Temporal, version, and knowledge-boundary hallucination
+A temporal hallucination arises when a model incorrectly represents the state of knowledge at
+a particular time. Examples include citing a result as available before its publication, treating a
+draft or preprint as a peer-reviewed article, applying a current standard to a historical study, or
+describing a software library's current behavior as though it existed in an earlier version.
+This category follows from the fact that research knowledge is dynamic. A statement can be true
+in 2026 and false as a description of the scientific record in 2021.
+Temporal hallucination should therefore be distinguished from ordinary factual error. The central
+question is not simply "Is this statement true?" but "Was this statement true, established, or
+knowable within the specified temporal frame?"
+3.8 Type VII: Retrieval- and tool-mediated hallucination
+Retrieval-Augmented Generation (RAG) can reduce reliance on parametric knowledge by
+supplying external evidence (Lewis et al., 2020), but retrieval does not eliminate hallucination.
+Instead, it introduces new error pathways:
+● retrieving an irrelevant document;
+● retrieving outdated information;
+● retrieving a secondary source when a primary source is required;
+● misreading retrieved evidence;
+● ignoring contradictory passages;
+● attributing information to the wrong document; or
+● generating claims not supported by retrieved text.
+Thus a model can hallucinate because retrieval failed or despite successful retrieval.
+RAGAS explicitly treats retrieval relevance, faithfulness to retrieved context, and generation
+quality as distinct evaluation dimensions (Es et al., 2024).
+Corrective Retrieval-Augmented Generation (CRAG) and Self-RAG illustrate attempts to
+address these weaknesses. CRAG evaluates retrieved material and triggers corrective retrieval
+when necessary, while Self-RAG trains the model to retrieve, generate, and critique selectively
+(Yan et al., 2024; Asai et al., 2024).
+3.9 Type VIII: Self-verification and tool-use hallucination
+
+A newer class concerns hallucinations about the model's own actions. An LLM may claim that
+it searched a database, opened a paper, executed code, checked a DOI, or verified a result
+when it did not actually perform that operation.
+This is conceptually distinct from ordinary factual hallucination because the false proposition
+concerns process provenance. Research environments increasingly involve tool-augmented
+agents, making this category increasingly relevant.
+A trustworthy research system must therefore distinguish between:
+● evidence actually retrieved;
+● evidence supplied by the user;
+● information inferred from model parameters; and
+● verification steps that were actually executed.
+A model should not be allowed to convert an intended action into a claimed completed action.
+3.10 Type IX: Synthesis and attribution hallucination
+Research commonly involves integrating multiple papers rather than summarizing one source. A
+synthesis hallucination occurs when the model constructs a cross-paper conclusion that is not
+justified by the collection of sources.
+For example, a model may correctly report results from Studies A, B, and C but then assert that
+"the literature consistently demonstrates X" even though the studies use incompatible definitions
+or reach divergent conclusions.
+This category is distinct from simple citation misattribution because all cited papers may be
+genuine and correctly represented individually. The hallucination occurs at the level of
+synthesis.
+
+4. Causes and Mechanisms
+Hallucinations arise from interacting properties of data, learning objectives, model architecture,
+inference, and task design (Ji et al., 2023; Huang et al., 2024).
+4.1 Imperfect and heterogeneous training data
+Web-scale corpora contain misinformation, contradictions, duplicated material, outdated
+information, low-quality sources, and incomplete documentation. A language model trained to
+predict text is therefore not directly optimized to distinguish reliable knowledge from unreliable
+text.
+
+TruthfulQA demonstrates one consequence: models may reproduce common misconceptions
+because those misconceptions are represented in their training distribution (Lin et al., 2022).
+4.2 Parametric knowledge and incomplete retrieval
+LLMs encode information indirectly in parameters. This knowledge can be useful but may be
+incomplete, outdated, entangled across contexts, or difficult to access precisely.
+Knowledge-intensive tasks motivated the development of RAG precisely because parametric
+models have limitations in accessing and updating factual information (Lewis et al., 2020).
+4.3 Objective mismatch
+The training objective for a conventional autoregressive model rewards likely continuations
+rather than truth. Fluent continuation therefore does not necessarily imply factual verification.
+This mismatch also explains why increasing model size alone cannot be assumed to solve
+hallucination. Larger models may improve many capabilities while retaining systematic
+weaknesses in truthfulness and calibration.
+4.4 Instruction following and alignment pressure
+Alignment methods encourage models to satisfy user requests and produce helpful responses.
+In some circumstances, however, a strong pressure to answer can compete with the safer
+behavior of explicitly stating uncertainty or refusing to speculate.
+Research prompts frequently contain implicit expectations such as "provide the references,"
+"explain why," or "identify the studies." If the model does not possess sufficient information, the
+objective of being helpful can produce plausible completion rather than abstention.
+4.5 Decoding and stochasticity
+Sampling-based generation permits multiple plausible continuations. SelfCheckGPT exploits
+this property by treating substantial disagreement among sampled outputs as a possible signal
+of hallucination (Manakul et al., 2023). More generally, generation settings can influence factual
+consistency, although decoding changes alone cannot solve underlying knowledge or grounding
+problems.
+
+5. Current Approaches to Detection and Mitigation
+5.1 Human verification
+
+Human expert review remains the strongest general-purpose safeguard for high-stakes
+research claims, but it is expensive and difficult to scale. Human reviewers also exhibit domain
+and source-selection biases. A practical system therefore needs automated screening to
+prioritize human attention.
+5.2 Claim-level factuality evaluation
+FActScore represents an important shift toward atomic claim evaluation. Rather than asking
+whether an entire response is factual, the evaluation estimates the fraction of atomic statements
+that are independently supported (Min et al., 2023).
+This approach is particularly appropriate for research assistants because a single paragraph
+can contain multiple claims about authors, methods, datasets, results, and interpretations.
+5.3 Entailment- and QA-based evaluation
+FactCC, dependency-level entailment, and question-answering approaches evaluate whether a
+generated statement follows from a reference document (Kryscinski et al., 2020; Goyal &
+Durrett, 2020). These methods are useful for summarization and source-grounded generation,
+but their performance can degrade when claims are complex, implicit, multi-document, or highly
+specialized.
+5.4 Sampling-based self-consistency
+SelfCheckGPT uses multiple generations to identify information that is unstable across samples
+(Manakul et al., 2023). This is attractive for black-box systems because it does not require
+access to model probabilities or an external knowledge base.
+However, self-consistency should not be confused with correctness. A model may repeatedly
+produce the same false statement because that statement is strongly encoded in its
+parameters.
+5.5 Semantic uncertainty
+Semantic entropy is designed to aggregate uncertainty over meanings rather than token
+sequences. Farquhar et al. (2024) showed that semantic entropy can detect an important class
+of hallucinations associated with lack of model knowledge.
+Its research value lies in supporting selective answering. Instead of requiring the system to
+answer every question, the model can abstain or trigger external verification when semantic
+uncertainty is high.
+5.6 Retrieval-Augmented Generation
+
+RAG connects a generator to an external corpus, allowing the system to use information beyond
+its parametric memory (Lewis et al., 2020). For research applications, this can facilitate access
+to current literature and provide source provenance.
+Yet RAG must not be treated as synonymous with factuality. Retrieval introduces errors of
+relevance, coverage, freshness, ranking, and interpretation. A retrieved passage can itself be
+low quality or contradictory.
+RAGAS explicitly decomposes evaluation into retrieval quality, context utilization/faithfulness,
+and generation quality (Es et al., 2024). Self-RAG further allows a model to decide when
+retrieval is needed and to critique its own evidence and generation (Asai et al., 2024). CRAG
+introduces a retrieval-quality evaluator and corrective retrieval procedures (Yan et al., 2024).
+5.7 Chain-of-Verification and post-generation verification
+Chain-of-Verification (CoVe) first drafts a response, generates verification questions, answers
+those questions independently, and then constructs a revised answer (Dhuliawala et al., 2023).
+This architecture addresses an important failure mode: a single generation may reinforce its
+own unsupported claims.
+Verification, however, remains vulnerable when the model is both generator and verifier.
+Independent retrieval, external databases, symbolic tools, or human review can provide
+stronger epistemic independence.
+5.8 Citation verification
+Research-oriented LLMs should treat references as structured data requiring verification rather
+than as unconstrained text generation. A reliable pipeline should validate, when possible:
+● publication existence;
+● author–title consistency;
+● venue and year;
+● DOI or other identifier;
+● bibliographic metadata; and
+● whether the source actually supports the cited claim.
+Evidence from fabricated-citation studies demonstrates why this layer is necessary (Walters &
+Wilder, 2023; Gravel et al., 2023).
+
+6. Comparative View of Hallucination Types
+
+Hallucination
+type
+
+Primary question Typical research
+example
+
+Best-suited
+detection
+Factual Is the claim true? Incorrect statistic External fact
+checking,
+claim-level
+verification
+
+Source-faithfulnes
+s
+
+Is the claim supported
+by the cited/source text?
+
+Misrepresenting a
+paper's result
+
+Entailment, QA,
+source comparison
+
+Citation/bibliograp
+hic
+
+Does the cited source
+exist and contain the
+claimed metadata?
+
+Fabricated DOI Crossref/Scopus/P
+ubMed/arXiv-style
+verification
+
+Reasoning/inferen
+tial
+
+Does the conclusion
+follow from the
+premises?
+
+Correlation →
+causation
+
+Argument analysis,
+expert review
+
+Methodological Is the study method
+represented correctly?
+
+Calling an observational
+study randomized
+
+Full-text/source
+inspection
+
+Temporal/version Is the claim correct for
+the specified
+date/version?
+
+Attributing later
+knowledge to an earlier
+paper
+
+Time-aware
+retrieval and
+version tracking
+
+Retrieval/tool-medi
+ated
+
+Did external evidence or
+a tool actually support
+the answer?
+
+Irrelevant retrieved
+paper
+
+Retrieval
+diagnostics,
+provenance
+
+Self-verification/to
+ol-use
+
+Did the system actually
+perform the claimed
+verification?
+
+"I checked the DOI"
+when no check
+occurred
+
+Execution logs and
+tool provenance
+
+Synthesis/attributi
+on
+
+Does the multi-source
+conclusion accurately
+integrate the literature?
+
+Claiming consensus
+from conflicting studies
+
+Cross-document
+evidence graphs
+
+The table illustrates why the binary label "hallucination/no hallucination" is insufficient for
+research deployment. Different categories require different evidence and different controls.
+
+7. Research Challenges and Limitations
+7.1 No universally accepted operational definition
+Hallucination remains a broad term covering several conceptually different phenomena. A model
+output may be false, unverifiable, unsupported by a provided source, logically invalid, or merely
+uncertain. Treating all such cases as equivalent complicates benchmarking and makes results
+difficult to compare across studies.
+A robust evaluation protocol should therefore declare the reference standard: world
+knowledge, source document, database record, scientific consensus, or a specified temporal
+snapshot.
+7.2 Evaluation depends on granularity
+Whole-response evaluation can hide substantial local errors. Conversely, atomic-claim
+evaluation may fragment complex methodological or inferential statements into pieces that
+appear individually correct despite a flawed overall argument.
+Future benchmarks should therefore operate at multiple granularities:
+1. token/entity level;
+2. atomic claim level;
+3. sentence level;
+4. argument level;
+5. source/document level; and
+6. research-conclusion level.
+7.3 Automatic evaluators can hallucinate
+An important limitation is evaluator reliability. LLM-based judges may themselves produce
+incorrect judgments, creating an evaluator–generator dependency. Even entailment models can
+
+fail when claims involve specialized terminology, numerical reasoning, negation, or implicit
+relationships.
+Accordingly, evaluation systems should report agreement with expert human judgments and test
+the robustness of automatic metrics rather than treating model-generated scores as ground
+truth.
+7.4 Domain expertise remains indispensable
+Scientific and technical hallucinations often involve subtle distinctions that general-purpose
+evaluators cannot reliably recognize. Whether an inference is justified may depend on domain
+conventions, statistical assumptions, experimental design, or specialized vocabulary.
+A generic hallucination detector may therefore perform well on Wikipedia-style questions while
+failing on specialized biomedical, legal, engineering, or social-science content.
+7.5 Bibliographic verification is not enough
+A reference can be authentic while the associated claim is unsupported. Therefore,
+bibliographic validation should be viewed as only one stage in a citation-verification pipeline.
+Research systems should distinguish at least:
+source existence → metadata correctness → source accessibility → claim support →
+interpretation correctness.
+7.6 RAG creates a false sense of security
+RAG improves access to external information but can introduce retrieval-specific failure modes.
+Poor retrieval, incomplete evidence, context overload, or incorrect interpretation can still
+produce hallucinated conclusions. RAG systems should therefore expose retrieval provenance
+and evidence coverage rather than merely displaying a list of sources.
+7.7 Temporal drift
+Research information changes over time. Benchmarks that use static truth sets may become
+outdated, especially for software, medical knowledge, policies, standards, and rapidly
+developing scientific areas.
+Future datasets should support versioned or date-indexed ground truth.
+
+8. Research Gaps and Future Directions
+
+8.1 Standardized multidimensional benchmarks
+Current benchmarks frequently focus on one dimension—truthfulness, factual consistency, or
+hallucination recognition. Future research should build multidimensional research
+hallucination benchmarks in which each example is annotated for:
+● factual correctness;
+● source support;
+● citation correctness;
+● methodological accuracy;
+● inferential validity;
+● temporal validity;
+● evidence provenance; and
+● uncertainty/abstention appropriateness.
+This would make it possible to compare systems across genuinely different failure modes.
+8.2 Provenance-native language models
+Research assistants should not merely produce answers; they should maintain explicit
+provenance graphs connecting each claim to its evidence. A future response representation
+could encode:
+[
+\text{Claim} \rightarrow \text{Evidence Passage} \rightarrow \text{Document} \rightarrow
+\text{Identifier} \rightarrow \text{Verification State}.
+]
+Such representations could turn hallucination prevention from a purely linguistic problem into an
+information-provenance problem.
+8.3 Claim-level uncertainty and calibrated abstention
+Future systems should estimate confidence at the level of individual claims rather than entire
+responses. A response might contain ten claims where eight are highly supported and two
+require verification.
+This suggests an architecture in which the model can produce:
+● supported;
+● weakly supported;
+● conflicting evidence;
+● unverifiable; or
+● high-uncertainty
+
+labels alongside claims.
+Semantic entropy and self-evaluation research provide promising foundations, but stronger
+calibration and external validation are needed (Kadavath et al., 2022; Farquhar et al., 2024).
+8.4 Temporal and version-aware research assistants
+Scholarly systems should explicitly model time. Literature agents should distinguish a preprint
+from its peer-reviewed version, identify retractions and corrections, and preserve the state of
+evidence at the date relevant to the research question.
+Temporal provenance is particularly important for systematic reviews and longitudinal scientific
+analyses.
+8.5 Citation verification as an integrated architecture
+Citation checking should occur during generation rather than only after a paper has been
+drafted. Future systems could retrieve candidate sources, verify bibliographic records, identify
+supporting passages, and prohibit unsupported citations from appearing in the final manuscript.
+The empirical evidence on fabricated citations strongly motivates this direction (Walters &
+Wilder, 2023). More recent scholarship on reference hallucinations further suggests that citation
+constraints and task structure can materially influence the form of hallucination produced by
+LLMs (Davis & Mahmoud, 2026).
+8.6 Independent verification agents
+A generator should not necessarily be its own final verifier. Future architectures could employ
+specialized independent agents:
+● a retrieval agent for evidence discovery;
+● a bibliographic agent for metadata verification;
+● a factuality agent for claim checking;
+● a reasoning agent for inferential validity;
+● a methodology agent for experimental-design interpretation; and
+● a provenance controller to ensure that claims are traceable.
+Such modular verification could be more reliable than asking a single general-purpose model to
+"check its work."
+8.7 Researcher-centered human–AI interaction
+The goal should not necessarily be zero hallucination, which may be unrealistic for open-ended
+generation. A more practical target is risk-aware assistance. Systems should surface uncertain
+
+claims, contradictory evidence, missing citations, and unverifiable statements instead of silently
+filling gaps.
+In scholarly settings, an LLM that occasionally abstains transparently may be more useful than
+one that generates polished but unverified prose.
+8.8 Evaluating downstream research harm
+Future work should move beyond measuring hallucination rates and investigate consequences.
+A fabricated citation in a casual brainstorming session may be inconvenient; the same error in a
+systematic review, clinical guideline, or meta-analysis can contaminate downstream evidence.
+Benchmarks should therefore evaluate not only frequency, but severity, detectability,
+propagation, and downstream impact.
+
+9. Conclusion
+Hallucination in Large Language Models is not a single failure mode. For research applications,
+it is a family of failures involving truth, evidence, inference, provenance, methodology, time,
+retrieval, and scholarly attribution. Existing distinctions such as intrinsic versus extrinsic
+hallucination and factuality versus faithfulness provide essential foundations, but they do not
+fully capture the complexity of research-oriented use.
+This paper proposed a multidimensional taxonomy comprising factual, source-faithfulness,
+citation/bibliographic, reasoning, methodological, temporal/version, retrieval- and tool-mediated,
+self-verification, and synthesis hallucinations. The taxonomy emphasizes that different
+hallucination types require different forms of evidence and different mitigation strategies.
+Current approaches—including FActScore, SelfCheckGPT, semantic entropy, RAG, Self-RAG,
+CRAG, and Chain-of-Verification—demonstrate substantial progress. Nevertheless, their
+effectiveness is conditional on task formulation, reference quality, domain expertise, and
+evaluator reliability. No existing method guarantees that an LLM-generated research output is
+simultaneously factually correct, source-faithful, methodologically accurate, logically valid,
+temporally appropriate, and bibliographically authentic.
+The central implication for research applications is therefore architectural rather than merely
+model-centric: trustworthy LLM assistance requires claim-level evaluation, explicit
+provenance, retrieval verification, citation checking, uncertainty estimation, temporal
+awareness, and appropriately targeted human oversight. Future research should treat
+hallucination taxonomy not simply as a catalog of mistakes but as a design framework linking
+identifiable failure modes to evidence standards, evaluation procedures, and mitigation
+mechanisms. Such a framework is necessary for moving LLMs from fluent research assistants
+toward dependable components of scholarly knowledge production.
