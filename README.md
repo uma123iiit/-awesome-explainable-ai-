@@ -85,7 +85,8 @@ Datasets and benchmarks are important for studying and evaluating hallucinations
 
 The selected datasets include information about their source, purpose, applications, and official access links.
 
-**View the complete dataset collection:** [Datasets](datasets/datasets.md)
+**View the complete dataset collection:** [Datasets](paper/citation-audit/references/datasets/datasets.md)
+
 
 ---
 
@@ -94,7 +95,8 @@ Tools and libraries provide practical support for developing, evaluating, and an
 
 Each selected tool includes its purpose and official project or documentation link.
 
-**View the complete collection of tools and libraries:** [Tools and Libraries](tools/tools.md)
+**View the complete collection of tools and libraries:** [Tools and Libraries](paper/citation-audit/references/datasets/tools/tools.md)
+
 
 ---
 
