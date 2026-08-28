@@ -132,4 +132,5 @@ This repository contains original documentation, organization, and resource desc
 
 The original content of this repository is made available under the **MIT License**. External research papers, datasets, software libraries, GitHub repositories, and other resources remain subject to their respective authors' or organizations' licenses.
 
-See the [LICENSE](LICENSE) file for the complete license text.
+See the [LICENSE](paper/citation-audit/references/datasets/tools/implementations/LICENSE) file for the complete license text.
+
