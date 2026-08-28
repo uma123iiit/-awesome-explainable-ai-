@@ -46,11 +46,15 @@ The work aims to provide researchers with a systematic framework for identifying
 
 ## Citation Integrity Audit
 
-A citation-integrity audit was conducted as part of the AI-assisted research process. The purpose of the audit is to check the reliability of references and research claims and to identify whether cited sources are relevant and verifiable.
+A citation-integrity audit was conducted as part of the AI-assisted research process to verify the reliability, authenticity, and relevance of the references included in this repository.
 
-The verification process considers bibliographic information such as paper title, authors, publication year, publication venue, and DOI or official publication links where available.
+Each reference was cross-verified by checking the paper title, authors, publication year, journal or conference, DOI where available, paper existence, and correctness of the provided link.
 
-**Citation Integrity Audit:** [View Citation Integrity Audit](citation-audit/Citation_Integrity_Audit.pdf)
+During the verification process, two incorrect paper links were identified and corrected. The references and links were then cross-checked again before inclusion.
+
+AI tools were used to assist with discovering and organizing candidate resources; however, the final references were independently verified before being included in this repository.
+
+**Citation Integrity Audit:** [View Citation Integrity Audit](paper/citation-audit/Citation%20Integrity%20Audit.pdf)
 
 ---
 
