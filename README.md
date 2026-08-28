@@ -81,78 +81,48 @@ Each selected paper includes relevant bibliographic information, a source or DOI
 ---
 
 ## Datasets
+Datasets and benchmarks are important for studying and evaluating hallucinations in Large Language Models (LLMs). This repository includes relevant datasets for hallucination detection, factuality evaluation, and research on reliable LLM-generated content.
 
-Datasets and benchmarks are important for evaluating hallucinations and factuality in Large Language Models. This section provides relevant datasets together with their source, description, intended use, and official links.
+The selected datasets include information about their source, purpose, applications, and official access links.
 
-The datasets can support research involving:
-
-* Hallucination detection
-* Factuality evaluation
-* Question answering
-* Text generation
-* Summarization
-* Claim verification
-* Citation and evidence evaluation
-
-**View the dataset collection:** [LLM Hallucination Datasets](datasets/datasets.md)
+**View the complete dataset collection:** [Datasets](datasets/datasets.md)
 
 ---
 
 ## Tools and Libraries
+Tools and libraries provide practical support for developing, evaluating, and analyzing Large Language Model (LLM) systems. This repository includes selected tools that are useful for hallucination detection, factuality evaluation, Retrieval-Augmented Generation (RAG), and overall LLM application evaluation.
 
-Software tools and libraries can help researchers detect, evaluate, analyze, and mitigate hallucinations in Large Language Models.
+Each selected tool includes its purpose and official project or documentation link.
 
-The collection includes tools related to:
-
-* LLM evaluation
-* Factuality assessment
-* Hallucination detection
-* Retrieval-Augmented Generation
-* Citation verification
-* Model evaluation
-* Natural language processing
-
-Each tool is accompanied by a brief description of its purpose and a link to its official project or documentation.
-
-**View the tools and libraries:** [LLM Hallucination Tools](tools/tools.md)
+**View the complete collection of tools and libraries:** [Tools and Libraries](tools/tools.md)
 
 ---
 
 ## GitHub Implementations
 
-Open-source GitHub repositories provide practical implementations of methods for studying, detecting, evaluating, and mitigating LLM hallucinations.
+Open-source GitHub repositories provide practical implementations of methods for detecting, evaluating, and mitigating hallucinations in Large Language Models (LLMs). These implementations can help researchers understand algorithms, reproduce experiments, and explore practical approaches to improving the reliability of LLM-generated content.
 
-The selected implementations are evaluated based on factors such as:
+The selected repositories are evaluated based on their relevance, documentation quality, source-code availability, reproducibility, maintenance, examples, licensing, and connection to research work.
 
-* Relevance to LLM hallucination research
-* Documentation quality
-* Source-code availability
-* Reproducibility
-* Maintenance and activity
-* Examples and demonstrations
-* Licensing
-* Connection to recognized research or published work
-
-**View the implementations:** [GitHub Implementations](implementations/github-repositories.md)
+**View the complete collection of GitHub implementations:** [GitHub Implementations](implementations/github-repositories.md)
 
 ---
 
-## Tutorials and Learning Resources
+## 📚 Tutorial / Learning Resources
 
-This section provides authoritative learning resources for understanding Large Language Models, hallucinations, factuality, evaluation, and mitigation techniques.
+The following resources provide authoritative learning materials for understanding hallucinations in Large Language Models (LLMs), including their taxonomy, causes, detection, evaluation, and mitigation.
 
-Resources may include:
+| # | Resource                                                                                                     | Purpose                                                                                                                                                                         | Link                                           |
+| - | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| 1 | **A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions** | Provides a comprehensive overview of LLM hallucinations, including their definitions, taxonomy, causes, detection methods, mitigation strategies, and open research challenges. | [Read Paper](https://arxiv.org/abs/2311.05232) |
+| 2 | **Survey on Hallucination in Natural Language Generation**                                                   | Provides foundational knowledge about hallucination in Natural Language Generation and discusses different types, causes, and evaluation approaches.                            | [Read Paper](https://arxiv.org/abs/2202.03629) |
+| 3 | **TruthfulQA: Measuring How Models Mimic Human Falsehoods**                                                  | Introduces a benchmark for evaluating whether language models generate truthful answers or reproduce common human misconceptions and false information.                         | [Read Paper](https://arxiv.org/abs/2109.07958) |
+| 4 | **FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation**              | Introduces a method for measuring factual precision in long-form generated text by decomposing responses into atomic facts and evaluating their factual correctness.            | [Read Paper](https://arxiv.org/abs/2305.14251) |
+| 5 | **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks**                                         | Explains Retrieval-Augmented Generation (RAG), an important approach for grounding LLM responses in external knowledge and reducing knowledge-related hallucinations.           | [Read Paper](https://arxiv.org/abs/2005.11401) |
 
-* Academic tutorials
-* Official documentation
-* Research lectures
-* LLM evaluation guides
-* Hallucination detection tutorials
-* Retrieval-Augmented Generation resources
-* Benchmark documentation
-* Research methodology resources
+> **Why these resources?**
+> Together, these resources cover the major aspects of LLM hallucination research: foundational concepts, hallucination taxonomy, factuality, evaluation, and mitigation through knowledge grounding.
 
-These resources are intended to support learning from introductory concepts to practical experimentation and advanced research.
 
 ---
 
