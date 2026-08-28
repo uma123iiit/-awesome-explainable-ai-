@@ -59,7 +59,6 @@ AI tools were used to assist with discovering and organizing candidate resources
 ---
 
 ## Curated Research Papers
-
 This repository contains a curated collection of verified scholarly research papers related to Large Language Model hallucinations.
 
 The papers are organized according to meaningful research areas, including:
@@ -76,7 +75,8 @@ The papers are organized according to meaningful research areas, including:
 
 Each selected paper includes relevant bibliographic information, a source or DOI link, and a brief explanation of its relevance to the topic.
 
-**View the complete collection:** [Curated Research References](references/references.md)
+**View the complete collection:** [Curated Research References](paper/citation-audit/references/references.md)
+
 
 ---
 
