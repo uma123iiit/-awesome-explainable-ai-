@@ -210,7 +210,7 @@ Introduces an annotated corpus for studying hallucinations in retrieval-augmente
 **Year:** 2020
 **Venue:** NeurIPS 2020
 
-[Paper](https://papers.nips.cc/paper/2020/hash/6b493230205f780e1bc26945df7481e5-Abstract.html)
+[Paper](https://arxiv.org/abs/2005.11401)
 
 Introduces Retrieval-Augmented Generation (RAG), which combines language models with retrieved external knowledge to improve knowledge-intensive generation and grounding.
 
@@ -272,7 +272,7 @@ Shows that LLM performance can degrade when relevant information occurs in the m
 **Year:** 2023
 **Journal:** Computational Linguistics
 
-[Paper](https://aclanthology.org/2023.cl-4.6/)
+[Paper](https://aclanthology.org/2023.cl-4.2/)
 
 Introduces the Attributable to Identified Sources (AIS) framework for evaluating whether generated statements about the external world are supported by a provided source, which is highly relevant to trustworthy research generation.
 
