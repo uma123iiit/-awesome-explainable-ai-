@@ -104,7 +104,7 @@ Open-source GitHub repositories provide practical implementations of methods for
 
 The selected repositories are evaluated based on their relevance, documentation quality, source-code availability, reproducibility, maintenance, examples, licensing, and connection to research work.
 
-**View the complete collection of GitHub implementations:** [GitHub Implementations](implementations/github-repositories.md)
+**View the complete collection of GitHub implementations:** [GitHub Implementations](paper/citation-audit/references/datasets/tools/implementations/github-repositories.md)
 
 ---
 
